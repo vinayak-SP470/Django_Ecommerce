@@ -1,27 +1,31 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from .models import CustomUser, Role
 
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
+class UserRegistrationForm(UserCreationForm):
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
+    phone_number = forms.CharField(label="Phone Number", max_length=20, required=False)
+    role = forms.ModelChoiceField(queryset=Role.objects.all(), label="Role", required=False)
 
     class Meta:
-        model = User
-        fields = ('username', 'first_name', 'email', 'password')
+        model = CustomUser
+        fields = ('username', 'first_name', 'email', 'password1', 'phone_number', 'role')
 
     def clean_username(self):
         # Get the cleaned username from the form
         username = self.cleaned_data.get('username')
 
         # Check if a user with the same username already exists
-        if User.objects.filter(username=username).exists():
+        if CustomUser.objects.filter(username=username).exists():
             raise forms.ValidationError('This username is already taken.')
 
         return username
 
     def clean_password2(self):
         cd = self.cleaned_data
-        if cd['password'] != cd['password2']:
+        if cd['password1'] != cd['password2']:
             raise forms.ValidationError('Passwords do not match')
         return cd['password2']

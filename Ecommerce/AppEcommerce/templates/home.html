@@ -16,6 +16,8 @@
             </div>
         {% else %}
             <div class="container mt-5">
+                <h1>Welcome, {{ request.user.get_full_name }}!</h1>
+                 <p>Your role: {{ request.user.role }}</p>
                 <h1>User is authenticated.</h1>
                 <a href="/logout" class="btn btn-primary">Logout</a>
             </div>
